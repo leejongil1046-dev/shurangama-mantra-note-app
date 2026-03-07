@@ -8,6 +8,14 @@ import { Platform } from 'react-native';
 const tintColorLight = '#000';
 const tintColorDark = '#fff';
 
+export const APP_TITLE = '대불수정능엄신주';
+
+/** Noto Serif KR (400~700). 루트 레이아웃에서 로드 */
+export const FONT_MANTRA_400 = 'NotoSerifKR_400Regular';
+export const FONT_MANTRA_500 = 'NotoSerifKR_500Medium';
+export const FONT_MANTRA_600 = 'NotoSerifKR_600SemiBold';
+export const FONT_MANTRA_700 = 'NotoSerifKR_700Bold';
+
 export const Colors = {
   light: {
     text: '#11181C',
