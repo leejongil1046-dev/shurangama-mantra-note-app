@@ -3,7 +3,7 @@
     "name": "shurangama-mantra-note-app",
     "slug": "shurangama-mantra-note-app",
     "version": "1.0.0",
-    "orientation": "portrait",
+    "orientation": "default",
     "icon": "./assets/images/icon.png",
     "scheme": "shurangamamantranoteapp",
     "userInterfaceStyle": "automatic",

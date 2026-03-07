@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Modal, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Modal, StyleSheet, Text, View } from 'react-native';
 
 import { Colors } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
@@ -7,6 +7,7 @@ import type { Difficulty } from '@/store/setting-store';
 import { useSettingStore } from '@/store/setting-store';
 
 import DifficultySetting from './difficulty-setting';
+import ModalActionButton from './modal-action-button';
 import PageRangeSetting from './page-range-setting';
 
 export type SettingMode = 'practice' | 'memorize';
@@ -81,30 +82,13 @@ export default function SettingModal({ open, onClose, mode }: SettingModalProps)
 
           <View style={styles.actions}>
             {onClose && (
-              <Pressable
-                onPress={onClose}
-                style={({ pressed }) => [
-                  styles.button,
-                  styles.cancelButton,
-                  { borderColor: colors.border },
-                  pressed && { opacity: 0.8 },
-                ]}
-              >
-                <Text style={[styles.cancelText, { color: colors.text }]}>취소</Text>
-              </Pressable>
+              <ModalActionButton label="취소" onPress={onClose} variant="cancel" />
             )}
-            <Pressable
+            <ModalActionButton
+              label="저장"
               onPress={handleSave}
-              disabled={!isChanged}
-              style={({ pressed }) => [
-                styles.button,
-                styles.saveButton,
-                !isChanged && styles.saveButtonDisabled,
-                pressed && isChanged && { opacity: 0.9 },
-              ]}
-            >
-              <Text style={[styles.saveText, !isChanged && styles.saveTextDisabled]}>저장</Text>
-            </Pressable>
+              variant={isChanged ? 'primary' : 'primaryDisabled'}
+            />
           </View>
         </View>
       </View>
@@ -138,21 +122,4 @@ const styles = StyleSheet.create({
     gap: 12,
     marginTop: 20,
   },
-  button: {
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 8,
-  },
-  cancelButton: {
-    borderWidth: 1,
-  },
-  cancelText: { fontSize: 15 },
-  saveButton: {
-    backgroundColor: '#11181C',
-  },
-  saveButtonDisabled: {
-    backgroundColor: '#9BA1A6',
-  },
-  saveText: { fontSize: 15, fontWeight: '600', color: '#fff' },
-  saveTextDisabled: { color: '#fff' },
 });

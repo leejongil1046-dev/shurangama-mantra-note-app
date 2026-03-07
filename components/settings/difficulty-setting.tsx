@@ -47,8 +47,8 @@ export default function DifficultySetting({ value, onChange }: DifficultySetting
 }
 
 const styles = StyleSheet.create({
-  wrap: { marginBottom: 20 },
-  label: { fontSize: 18, fontWeight: '600', marginBottom: 8 },
+  wrap: { marginBottom: 15 },
+  label: { fontSize: 18, fontWeight: '600', marginBottom: 15 },
   row: {
     flexDirection: 'row',
     borderWidth: 1,
@@ -61,5 +61,5 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  optionText: { fontSize: 15, fontWeight: '500' },
+  optionText: { fontSize: 15, fontWeight: '400' },
 });

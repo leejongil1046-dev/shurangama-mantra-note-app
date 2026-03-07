@@ -63,6 +63,6 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   rangeText: { fontSize: 14 },
-  sliderWrap: { paddingHorizontal: 4 },
-  slider: { height: 40 },
+  sliderWrap: { paddingHorizontal: 3 },
+  slider: { height: 30 },
 });

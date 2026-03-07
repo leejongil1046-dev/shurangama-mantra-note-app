@@ -3,9 +3,10 @@ import { Dimensions, ScrollView, StyleSheet, View } from 'react-native';
 
 import MantraTextView from '@/components/mantra-text-view';
 import PaginationControls from '@/components/pagination-controls';
+import ConfirmModal from '@/components/settings/confirm-modal';
 import SettingModal from '@/components/settings/setting-modal';
-import TopSettingButton from '@/components/top-setting-button';
 import ToggleSwitch from '@/components/toggle-switch';
+import TopSettingButton from '@/components/top-setting-button';
 import { Colors } from '@/constants/theme';
 import { SHURANGAMA_MANTRA_PAGES } from '@/data/shurangama-mantra';
 import { useColorScheme } from '@/hooks/use-color-scheme';
@@ -20,6 +21,7 @@ export default function PracticeScreen() {
   const [pageIndex, setPageIndex] = useState(0);
   const [blankEnabled, setBlankEnabled] = useState(false);
   const [settingOpen, setSettingOpen] = useState(false);
+  const [confirmOpen, setConfirmOpen] = useState(false);
 
   const { pageStart, pageEnd, difficulty } = useSettingStore((s) => s.practice);
 
@@ -59,29 +61,28 @@ export default function PracticeScreen() {
           <PaginationControls
             isFirst={isFirst}
             isLast={isLast}
-            label={current ? `${current.pageNumber} / ${totalInRange}` : '0 / 0'}
+            label={current ? `${current.pageNumber} / 12` : '0 / 0'}
             onPrev={() => setPageIndex((i) => Math.max(0, i - 1))}
-            onNext={() =>
-              setPageIndex((i) => Math.min(totalInRange - 1, i + 1))
-            }
+            onNext={() => setPageIndex((i) => Math.min(totalInRange - 1, i + 1))}
           />
         </View>
         <View style={styles.paginationRight}>
           <TopSettingButton
-            onReset={() => {
-              setPageIndex(0);
-              setBlankEnabled(false);
-            }}
+            onRequestReset={() => setConfirmOpen(true)}
             onOpenSettings={() => setSettingOpen(true)}
-            resetConfirmMessage="연습을 초기화하시겠습니까? (첫 페이지, 빈칸 해제)"
           />
         </View>
       </View>
 
-      <SettingModal
-        open={settingOpen}
-        mode="practice"
-        onClose={() => setSettingOpen(false)}
+      <SettingModal open={settingOpen} mode="practice" onClose={() => setSettingOpen(false)} />
+      <ConfirmModal
+        open={confirmOpen}
+        mode="reset-practice"
+        onConfirm={() => {
+          setPageIndex(0);
+          setBlankEnabled(false);
+        }}
+        onClose={() => setConfirmOpen(false)}
       />
 
       <ScrollView
