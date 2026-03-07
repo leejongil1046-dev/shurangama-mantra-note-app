@@ -10,3 +10,10 @@ export interface MantraPageItem {
   pageNumber: number;
   mantra: Mantra;
 }
+
+export interface RenderLineInfo {
+  line: string;
+  indent: number;
+  startIndex: number;
+  endIndex: number;
+}
