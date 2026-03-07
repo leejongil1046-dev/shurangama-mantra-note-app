@@ -34,7 +34,7 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="example"
+        name="memorize"
         options={{
           title: '암기하기',
           tabBarIcon: ({ color }) => <Feather name="edit" size={24} color={color} />,
