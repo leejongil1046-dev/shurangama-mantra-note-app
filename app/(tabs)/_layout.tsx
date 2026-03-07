@@ -27,7 +27,7 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="explore"
+        name="practice"
         options={{
           title: '연습하기',
           tabBarIcon: ({ color }) => <Feather name="book-open" size={24} color={color} />,

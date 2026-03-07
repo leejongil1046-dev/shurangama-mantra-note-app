@@ -1,31 +1,48 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Dimensions, ScrollView, StyleSheet, View } from 'react-native';
 
 import MantraTextView from '@/components/mantra-text-view';
 import PaginationControls from '@/components/pagination-controls';
+import SettingModal from '@/components/settings/setting-modal';
+import TopSettingButton from '@/components/top-setting-button';
 import ToggleSwitch from '@/components/toggle-switch';
 import { Colors } from '@/constants/theme';
 import { SHURANGAMA_MANTRA_PAGES } from '@/data/shurangama-mantra';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { createBlankIndices, difficultyToRatio } from '@/lib/mantra-blank';
+import { useSettingStore } from '@/store/setting-store';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
-const TOTAL_PAGES = SHURANGAMA_MANTRA_PAGES.length;
 
-export default function TabTwoScreen() {
+export default function PracticeScreen() {
   const colorScheme = useColorScheme();
   const backgroundColor = Colors[colorScheme ?? 'light'].background;
   const [pageIndex, setPageIndex] = useState(0);
   const [blankEnabled, setBlankEnabled] = useState(false);
+  const [settingOpen, setSettingOpen] = useState(false);
 
-  const current = SHURANGAMA_MANTRA_PAGES[pageIndex];
-  const isFirst = pageIndex === 0;
-  const isLast = pageIndex === TOTAL_PAGES - 1;
+  const { pageStart, pageEnd, difficulty } = useSettingStore((s) => s.practice);
+
+  const filteredPages = useMemo(() => {
+    return SHURANGAMA_MANTRA_PAGES.filter(
+      (p) => p.pageNumber >= pageStart && p.pageNumber <= pageEnd,
+    );
+  }, [pageStart, pageEnd]);
+
+  useEffect(() => {
+    setPageIndex((i) => Math.min(i, Math.max(0, filteredPages.length - 1)));
+  }, [filteredPages.length]);
+
+  const totalInRange = filteredPages.length;
+  const safeIndex = Math.min(pageIndex, Math.max(0, totalInRange - 1));
+  const current = filteredPages[safeIndex];
+  const isFirst = safeIndex === 0;
+  const isLast = safeIndex === totalInRange - 1;
 
   const blankIndices = useMemo(() => {
-    if (!blankEnabled) return new Set<number>();
-    return createBlankIndices(SHURANGAMA_MANTRA_PAGES[pageIndex].mantra, difficultyToRatio.medium);
-  }, [blankEnabled, pageIndex]);
+    if (!blankEnabled || !current) return new Set<number>();
+    return createBlankIndices(current.mantra, difficultyToRatio[difficulty]);
+  }, [blankEnabled, current, difficulty]);
 
   return (
     <View style={[styles.container, { backgroundColor }]}>
@@ -42,13 +59,30 @@ export default function TabTwoScreen() {
           <PaginationControls
             isFirst={isFirst}
             isLast={isLast}
-            label={`${current.pageNumber} / ${TOTAL_PAGES}`}
+            label={current ? `${current.pageNumber} / ${totalInRange}` : '0 / 0'}
             onPrev={() => setPageIndex((i) => Math.max(0, i - 1))}
-            onNext={() => setPageIndex((i) => Math.min(TOTAL_PAGES - 1, i + 1))}
+            onNext={() =>
+              setPageIndex((i) => Math.min(totalInRange - 1, i + 1))
+            }
           />
         </View>
-        <View style={styles.paginationRight} />
+        <View style={styles.paginationRight}>
+          <TopSettingButton
+            onReset={() => {
+              setPageIndex(0);
+              setBlankEnabled(false);
+            }}
+            onOpenSettings={() => setSettingOpen(true)}
+            resetConfirmMessage="연습을 초기화하시겠습니까? (첫 페이지, 빈칸 해제)"
+          />
+        </View>
       </View>
+
+      <SettingModal
+        open={settingOpen}
+        mode="practice"
+        onClose={() => setSettingOpen(false)}
+      />
 
       <ScrollView
         style={styles.scrollArea}
@@ -61,12 +95,14 @@ export default function TabTwoScreen() {
           contentContainerStyle={[styles.horizontalContent, { minWidth: SCREEN_WIDTH }]}
         >
           <View style={styles.mantraWrap}>
-            <MantraTextView
-              mantra={current.mantra}
-              fontSize={16}
-              blankIndices={blankIndices}
-              mode="practice"
-            />
+            {current && (
+              <MantraTextView
+                mantra={current.mantra}
+                fontSize={16}
+                blankIndices={blankIndices}
+                mode="practice"
+              />
+            )}
           </View>
         </ScrollView>
       </ScrollView>
@@ -105,6 +141,8 @@ const styles = StyleSheet.create({
   },
   paginationRight: {
     flex: 1,
+    alignItems: 'flex-end',
+    justifyContent: 'center',
   },
   horizontalContent: {
     paddingHorizontal: 16,
