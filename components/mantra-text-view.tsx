@@ -1,5 +1,5 @@
 import React, { useRef } from 'react';
-import { StyleSheet, Text, TextInput, View } from 'react-native';
+import { Platform, StyleSheet, Text, TextInput, View } from 'react-native';
 
 import { Colors, FONT_MANTRA_400, FONT_MANTRA_600 } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
@@ -93,10 +93,14 @@ export default function MantraTextView({
                   styles.charText,
                   {
                     fontSize,
-                    lineHeight: fontSize * 1.25,
+                    lineHeight: charBoxHeight,
                     fontFamily: FONT_MANTRA_600,
                     color: graded.isCorrect ? CORRECT_COLOR : WRONG_COLOR,
                     width: charBoxWidth,
+                    ...(Platform.OS === 'android' && { includeFontPadding: false }),
+                    ...(Platform.OS !== 'web' && {
+                      marginTop: -Math.round((fontSize / 16) * 2),
+                    }),
                   },
                 ]}
               >
@@ -112,9 +116,9 @@ export default function MantraTextView({
             str.length === 0
               ? ''
               : typeof Intl.Segmenter !== 'undefined'
-                ? [...new Intl.Segmenter('ko', { granularity: 'grapheme' }).segment(str)].pop()
-                    ?.segment ?? ''
-                : [...str].pop() ?? '';
+                ? ([...new Intl.Segmenter('ko', { granularity: 'grapheme' }).segment(str)].pop()
+                    ?.segment ?? '')
+                : ([...str].pop() ?? '');
 
           const handleChange = (text: string) => {
             if (text.length === 0) {
@@ -130,29 +134,39 @@ export default function MantraTextView({
             onChangeAnswer(globalIndex, getLastChar(text));
           };
           return (
-            <TextInput
+            <View
               key={globalIndex}
-              ref={(r) => {
-                inputRefs.current[globalIndex] = r;
-              }}
-              value={value}
-              onChangeText={handleChange}
               style={[
                 styles.charBox,
-                styles.inputBox,
+                styles.inputWrap,
                 {
                   width: charBoxWidth,
                   height: charBoxHeight,
                   backgroundColor: BOX_BG,
-                  fontSize,
-                  lineHeight: charBoxHeight,
-                  fontFamily: FONT_MANTRA_600,
-                  color: textColor,
-                  textAlignVertical: 'center',
-                  includeFontPadding: false,
                 },
               ]}
-            />
+            >
+              <TextInput
+                ref={(r) => {
+                  inputRefs.current[globalIndex] = r;
+                }}
+                value={value}
+                onChangeText={handleChange}
+                style={[
+                  styles.inputBox,
+                  {
+                    width: charBoxWidth,
+                    height: charBoxHeight,
+                    fontSize,
+                    lineHeight: charBoxHeight,
+                    fontFamily: FONT_MANTRA_600,
+                    color: textColor,
+                    textAlignVertical: 'center',
+                    ...(Platform.OS === 'android' && { includeFontPadding: false }),
+                  },
+                ]}
+              />
+            </View>
           );
         }
 
@@ -222,6 +236,9 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: BOX_BORDER,
     borderRadius: 5,
+  },
+  inputWrap: {
+    padding: 0,
   },
   charBoxReadOnly: {
     alignItems: 'center',
