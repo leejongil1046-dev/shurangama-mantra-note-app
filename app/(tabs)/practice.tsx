@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Dimensions, ScrollView, StyleSheet, View } from 'react-native';
 
 import MantraTextView from '@/components/mantra-text-view';
@@ -8,6 +8,7 @@ import TopSettingButton from '@/components/top-setting-button';
 import { Colors } from '@/constants/theme';
 import { SHURANGAMA_MANTRA_PAGES } from '@/data/shurangama-mantra';
 import { useColorScheme } from '@/hooks/use-color-scheme';
+import { usePagination } from '@/hooks/use-pagination';
 import { createBlankIndices, difficultyToRatio } from '@/lib/mantra-blank';
 import { useSettingStore } from '@/store/setting-store';
 
@@ -18,7 +19,6 @@ const { width: SCREEN_WIDTH } = Dimensions.get('window');
 export default function PracticeScreen() {
   const colorScheme = useColorScheme();
   const backgroundColor = Colors[colorScheme ?? 'light'].background;
-  const [pageIndex, setPageIndex] = useState(0);
   const [showBlanks, setShowBlanks] = useState(false);
   const [blankByPage, setBlankByPage] = useState<BlankByPage>({});
 
@@ -31,15 +31,15 @@ export default function PracticeScreen() {
     [pageStart, pageEnd],
   );
 
-  useEffect(() => {
-    setPageIndex((i) => Math.min(i, Math.max(0, selectedPages.length - 1)));
-  }, [selectedPages.length]);
-
-  const totalInRange = selectedPages.length;
-  const currentIndex = Math.min(pageIndex, Math.max(0, totalInRange - 1));
-  const currentPage = selectedPages[currentIndex];
-  const isFirst = currentIndex === 0;
-  const isLast = currentIndex === totalInRange - 1;
+  const {
+    currentIndex,
+    currentItem: currentPage,
+    isFirst,
+    isLast,
+    goPrev,
+    goNext,
+    setCurrentIndex,
+  } = usePagination({ items: selectedPages });
 
   const currentBlankIndices = blankByPage[currentIndex] ?? new Set<number>();
 
@@ -57,30 +57,29 @@ export default function PracticeScreen() {
   const handleResetPractice = () => {
     setBlankByPage({});
     setShowBlanks(false);
-    setPageIndex(0);
+    setCurrentIndex(0);
   };
+
+  if (!currentPage) return null;
 
   return (
     <View style={[styles.container, { backgroundColor }]}>
       <View
-        style={[
-          styles.paginationWrap,
-          { borderBottomColor: Colors[colorScheme ?? 'light'].border },
-        ]}
+        style={[styles.topBarWrap, { borderBottomColor: Colors[colorScheme ?? 'light'].border }]}
       >
-        <View style={styles.paginationLeft}>
+        <View style={styles.topBarLeft}>
           <ToggleSwitch label="빈칸" checked={showBlanks} onChange={handleToggleBlanks} />
         </View>
-        <View style={styles.paginationCenter}>
+        <View style={styles.topBarCenter}>
           <PaginationControls
             isFirst={isFirst}
             isLast={isLast}
             label={currentPage ? `${currentPage.pageNumber} / 12` : '0 / 0'}
-            onPrev={() => setPageIndex((i) => Math.max(0, i - 1))}
-            onNext={() => setPageIndex((i) => Math.min(totalInRange - 1, i + 1))}
+            onPrev={goPrev}
+            onNext={goNext}
           />
         </View>
-        <View style={styles.paginationRight}>
+        <View style={styles.topBarRight}>
           <TopSettingButton mode="practice" onReset={handleResetPractice} />
         </View>
       </View>
@@ -115,35 +114,33 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
-  scrollArea: {
-    flex: 1,
-  },
-  content: {
-    paddingVertical: 16,
-    paddingBottom: 32,
-  },
-  paginationWrap: {
+  topBarWrap: {
     width: '100%',
     flexDirection: 'row',
     alignItems: 'center',
     paddingVertical: 10,
-    marginBottom: 10,
     borderBottomWidth: 1,
     paddingHorizontal: 16,
   },
-  paginationLeft: {
+  topBarLeft: {
     flex: 1,
     alignItems: 'flex-start',
   },
-  paginationCenter: {
+  topBarCenter: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  paginationRight: {
+  topBarRight: {
     flex: 1,
     alignItems: 'flex-end',
     justifyContent: 'center',
+  },
+  scrollArea: {
+    flex: 1,
+  },
+  content: {
+    paddingVertical: 10,
   },
   horizontalContent: {
     paddingHorizontal: 16,

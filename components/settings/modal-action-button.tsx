@@ -9,9 +9,6 @@ type ModalActionButtonProps = {
   variant: 'cancel' | 'primary' | 'primaryDisabled';
 };
 
-const PADDING_V = 10;
-const PADDING_H = 20;
-
 export default function ModalActionButton({ label, onPress, variant }: ModalActionButtonProps) {
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme ?? 'light'];
@@ -40,8 +37,8 @@ export default function ModalActionButton({ label, onPress, variant }: ModalActi
 
 const styles = StyleSheet.create({
   button: {
-    paddingVertical: PADDING_V,
-    paddingHorizontal: PADDING_H,
+    paddingVertical: 10,
+    paddingHorizontal: 20,
     borderRadius: 8,
     alignSelf: 'flex-start',
   },
