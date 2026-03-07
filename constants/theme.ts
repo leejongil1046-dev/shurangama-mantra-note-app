@@ -8,7 +8,7 @@ import { Platform } from 'react-native';
 const tintColorLight = '#000';
 const tintColorDark = '#fff';
 
-export const APP_TITLE = '대불수정능엄신주';
+export const APP_TITLE = '대불정수능엄신주';
 
 /** Noto Serif KR (400~700). 루트 레이아웃에서 로드 */
 export const FONT_MANTRA_400 = 'NotoSerifKR_400Regular';
@@ -24,6 +24,8 @@ export const Colors = {
     icon: '#687076',
     tabIconDefault: '#687076',
     tabIconSelected: tintColorLight,
+    /** 구분선·보더 (예: 페이지네이션 박스 하단) */
+    border: '#eee',
   },
   dark: {
     text: '#ECEDEE',
@@ -32,6 +34,7 @@ export const Colors = {
     icon: '#9BA1A6',
     tabIconDefault: '#9BA1A6',
     tabIconSelected: tintColorDark,
+    border: '#9BA1A6',
   },
 };
 

@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
+import React from 'react';
+import { StyleSheet, Text, TextInput, View } from 'react-native';
 
 import { Colors, FONT_MANTRA_400, FONT_MANTRA_600 } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
@@ -27,13 +27,11 @@ const BOX_BORDER = '#999';
 const BOX_BG = '#f8f8f8';
 const CORRECT_COLOR = '#2563eb';
 const WRONG_COLOR = '#dc2626';
-const HIDDEN_COLOR = '#f8f8f8';
-const REVEALED_COLOR = '#9ca3af';
 
 export function getMantraLayoutByFontSize(fontSize: number = DEFAULT_FONT_SIZE) {
   return {
     fontSize,
-    charBoxWidth: 18 * 1,
+    charBoxWidth: 20 * 1,
     charBoxHeight: 22 * 1,
     marginBottom: 8 * 1,
   };
@@ -52,16 +50,6 @@ export default function MantraTextView({
   const textColor = Colors[colorScheme ?? 'light'].text;
   const { charBoxWidth, charBoxHeight, marginBottom } = getMantraLayoutByFontSize(fontSize);
   const lines = getLinesForRender(mantra);
-  const [revealedIndices, setRevealedIndices] = useState<Set<number>>(new Set());
-
-  const toggleReveal = (index: number) => {
-    setRevealedIndices((prev) => {
-      const next = new Set(prev);
-      if (next.has(index)) next.delete(index);
-      else next.add(index);
-      return next;
-    });
-  };
 
   const renderLine = (lineInfo: RenderLineInfo, lineIndex: number) => {
     const { line, indent, startIndex } = lineInfo;
@@ -92,7 +80,7 @@ export default function MantraTextView({
                   styles.charText,
                   {
                     fontSize,
-                    lineHeight: fontSize + 6,
+                    lineHeight: charBoxHeight,
                     fontFamily: FONT_MANTRA_600,
                     color: graded.isCorrect ? CORRECT_COLOR : WRONG_COLOR,
                     width: charBoxWidth,
@@ -129,11 +117,9 @@ export default function MantraTextView({
           );
         }
 
-        const isRevealed = revealedIndices.has(globalIndex);
         return (
-          <Pressable
+          <View
             key={globalIndex}
-            onPress={() => toggleReveal(globalIndex)}
             style={[
               styles.charBox,
               {
@@ -142,22 +128,7 @@ export default function MantraTextView({
                 backgroundColor: BOX_BG,
               },
             ]}
-          >
-            <Text
-              style={[
-                styles.charText,
-                {
-                  fontSize,
-                  lineHeight: fontSize + 6,
-                  fontFamily: FONT_MANTRA_600,
-                  color: isRevealed ? REVEALED_COLOR : HIDDEN_COLOR,
-                  width: charBoxWidth,
-                },
-              ]}
-            >
-              {char}
-            </Text>
-          </Pressable>
+          />
         );
       }
 
@@ -171,7 +142,7 @@ export default function MantraTextView({
               styles.charText,
               {
                 fontSize,
-                lineHeight: fontSize + 6,
+                lineHeight: charBoxHeight,
                 fontFamily: FONT_MANTRA_400,
                 color: textColor,
                 width: charBoxWidth,

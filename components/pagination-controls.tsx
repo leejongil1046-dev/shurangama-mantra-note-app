@@ -37,7 +37,7 @@ export default function PaginationControls({
         ]}
         accessibilityLabel="이전 페이지"
       >
-        <Feather name="chevron-left" size={20} color={colors.text} />
+        <Feather name="chevron-left" size={16} color={colors.text} />
       </Pressable>
 
       <Text style={[styles.label, { color: colors.icon }]}>{label}</Text>
@@ -54,7 +54,7 @@ export default function PaginationControls({
         ]}
         accessibilityLabel="다음 페이지"
       >
-        <Feather name="chevron-right" size={20} color={colors.text} />
+        <Feather name="chevron-right" size={16} color={colors.text} />
       </Pressable>
     </View>
   );
@@ -65,17 +65,17 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    width: 150,
+    width: 120,
   },
   button: {
-    width: 32,
-    height: 32,
+    width: 28,
+    height: 28,
     alignItems: 'center',
     justifyContent: 'center',
     borderRadius: 6,
     borderWidth: 1,
   },
   label: {
-    fontSize: 15,
+    fontSize: 13,
   },
 });
