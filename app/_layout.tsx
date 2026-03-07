@@ -7,6 +7,8 @@ import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import 'react-native-reanimated';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { StyleSheet } from 'react-native';
 
 import { APP_TITLE, Colors, FONT_MANTRA_700 } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
@@ -29,18 +31,24 @@ export default function RootLayout() {
   if (!fontsLoaded) return null;
 
   return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Stack
-        screenOptions={{
-          headerTitleAlign: 'center',
-          headerTitleStyle: { fontFamily: FONT_MANTRA_700, fontSize: 26 },
-          headerTintColor: themeColors.text,
-        }}
-      >
-        <Stack.Screen name="(tabs)" options={{ headerShown: true, title: APP_TITLE }} />
-        <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />
-      </Stack>
-      <StatusBar style="auto" />
-    </ThemeProvider>
+    <GestureHandlerRootView style={styles.gestureRoot}>
+      <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+        <Stack
+          screenOptions={{
+            headerTitleAlign: 'center',
+            headerTitleStyle: { fontFamily: FONT_MANTRA_700, fontSize: 26 },
+            headerTintColor: themeColors.text,
+          }}
+        >
+          <Stack.Screen name="(tabs)" options={{ headerShown: true, title: APP_TITLE }} />
+          <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />
+        </Stack>
+        <StatusBar style="auto" />
+      </ThemeProvider>
+    </GestureHandlerRootView>
   );
 }
+
+const styles = StyleSheet.create({
+  gestureRoot: { flex: 1 },
+});

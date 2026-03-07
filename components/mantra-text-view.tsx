@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import { StyleSheet, Text, TextInput, View } from 'react-native';
 
 import { Colors, FONT_MANTRA_400, FONT_MANTRA_600 } from '@/constants/theme';
@@ -29,11 +29,14 @@ const CORRECT_COLOR = '#2563eb';
 const WRONG_COLOR = '#dc2626';
 
 export function getMantraLayoutByFontSize(fontSize: number = DEFAULT_FONT_SIZE) {
+  const baseFontSize = DEFAULT_FONT_SIZE;
+  const ratio = fontSize / baseFontSize;
+
   return {
     fontSize,
-    charBoxWidth: 20 * 1,
-    charBoxHeight: 22 * 1,
-    marginBottom: 8 * 1,
+    charBoxWidth: 20 * ratio,
+    charBoxHeight: 22 * ratio,
+    marginBottom: 8 * ratio,
   };
 }
 
@@ -50,6 +53,16 @@ export default function MantraTextView({
   const textColor = Colors[colorScheme ?? 'light'].text;
   const { charBoxWidth, charBoxHeight, marginBottom } = getMantraLayoutByFontSize(fontSize);
   const lines = getLinesForRender(mantra);
+  const inputRefs = useRef<Record<number, TextInput | null>>({});
+
+  const focusNextBlank = (currentIndex: number) => {
+    const sorted = Array.from(blankIndices).sort((a, b) => a - b);
+    const pos = sorted.indexOf(currentIndex);
+    const nextIndex = sorted[pos + 1];
+    if (nextIndex !== undefined) {
+      setTimeout(() => inputRefs.current[nextIndex]?.focus(), 0);
+    }
+  };
 
   const renderLine = (lineInfo: RenderLineInfo, lineIndex: number) => {
     const { line, indent, startIndex } = lineInfo;
@@ -95,12 +108,35 @@ export default function MantraTextView({
 
         if (isMemorize && onChangeAnswer) {
           const value = answers?.[globalIndex] ?? '';
+          const getLastChar = (str: string) =>
+            str.length === 0
+              ? ''
+              : typeof Intl.Segmenter !== 'undefined'
+                ? [...new Intl.Segmenter('ko', { granularity: 'grapheme' }).segment(str)].pop()
+                    ?.segment ?? ''
+                : [...str].pop() ?? '';
+
+          const handleChange = (text: string) => {
+            if (text.length === 0) {
+              onChangeAnswer(globalIndex, '');
+              return;
+            }
+            if (text.endsWith(' ')) {
+              const withoutSpace = text.slice(0, -1);
+              onChangeAnswer(globalIndex, getLastChar(withoutSpace));
+              focusNextBlank(globalIndex);
+              return;
+            }
+            onChangeAnswer(globalIndex, getLastChar(text));
+          };
           return (
             <TextInput
               key={globalIndex}
+              ref={(r) => {
+                inputRefs.current[globalIndex] = r;
+              }}
               value={value}
-              maxLength={1}
-              onChangeText={(text) => onChangeAnswer(globalIndex, text)}
+              onChangeText={handleChange}
               style={[
                 styles.charBox,
                 styles.inputBox,
@@ -109,8 +145,11 @@ export default function MantraTextView({
                   height: charBoxHeight,
                   backgroundColor: BOX_BG,
                   fontSize,
+                  lineHeight: charBoxHeight,
                   fontFamily: FONT_MANTRA_600,
                   color: textColor,
+                  textAlignVertical: 'center',
+                  includeFontPadding: false,
                 },
               ]}
             />
@@ -194,5 +233,6 @@ const styles = StyleSheet.create({
   inputBox: {
     textAlign: 'center',
     padding: 0,
+    margin: 0,
   },
 });

@@ -34,15 +34,12 @@ const defaultRange: PageRangeSetting = {
   difficulty: 'easy',
 };
 
-const DEFAULT_FONT_SIZE = 20;
-const MIN_FONT_SIZE = 18;
-const MAX_FONT_SIZE = 22;
+const DEFAULT_FONT_SIZE = 16;
+const MIN_FONT_SIZE = 14;
+const MAX_FONT_SIZE = 18;
 const FONT_SIZE_STEP = 1;
 
-function clampPageRange(
-  start: number,
-  end: number,
-): { start: number; end: number } {
+function clampPageRange(start: number, end: number): { start: number; end: number } {
   const normalizedStart = Math.max(1, Math.min(start, TOTAL_PAGES));
   const normalizedEnd = Math.max(normalizedStart, Math.min(end, TOTAL_PAGES));
   return { start: normalizedStart, end: normalizedEnd };

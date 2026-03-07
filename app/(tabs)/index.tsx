@@ -170,11 +170,11 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   content: {
-    maxWidth: 560,
+    maxWidth: 800,
     width: '100%',
     alignSelf: 'center',
     paddingHorizontal: 24,
-    paddingTop: 24,
+    paddingTop: 10,
     paddingBottom: 48,
   },
   hero: {

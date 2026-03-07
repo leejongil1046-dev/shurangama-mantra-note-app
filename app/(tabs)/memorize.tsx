@@ -23,6 +23,7 @@ export default function MemorizeScreen() {
   const backgroundColor = Colors[colorScheme ?? 'light'].background;
 
   const { pageStart, pageEnd, difficulty } = useSettingStore((s) => s.memorize);
+  const fontSize = useSettingStore((s) => s.fontSize);
   const ratio = difficultyToRatio[difficulty];
 
   const selectedPages = useMemo(
@@ -172,7 +173,7 @@ export default function MemorizeScreen() {
             {isActive ? (
               <MantraTextView
                 mantra={currentPage.mantra}
-                fontSize={16}
+                fontSize={fontSize}
                 blankIndices={currentBlankIndices}
                 mode="memorize"
                 answers={currentAnswers}
@@ -182,7 +183,7 @@ export default function MemorizeScreen() {
             ) : (
               <MantraTextView
                 mantra={currentPage.mantra}
-                fontSize={16}
+                fontSize={fontSize}
                 blankIndices={new Set()}
                 mode="practice"
               />
@@ -224,7 +225,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   content: {
-    paddingVertical: 16,
+    paddingVertical: 10,
   },
   horizontalContent: {
     paddingHorizontal: 16,

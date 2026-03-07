@@ -23,6 +23,7 @@ export default function PracticeScreen() {
   const [blankByPage, setBlankByPage] = useState<BlankByPage>({});
 
   const { pageStart, pageEnd, difficulty } = useSettingStore((s) => s.practice);
+  const fontSize = useSettingStore((s) => s.fontSize);
   const ratio = difficultyToRatio[difficulty];
 
   const selectedPages = useMemo(
@@ -98,7 +99,7 @@ export default function PracticeScreen() {
             {currentPage && (
               <MantraTextView
                 mantra={currentPage.mantra}
-                fontSize={16}
+                fontSize={fontSize}
                 blankIndices={showBlanks ? currentBlankIndices : new Set()}
                 mode="practice"
               />
