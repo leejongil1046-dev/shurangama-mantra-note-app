@@ -31,8 +31,8 @@ const WRONG_COLOR = '#dc2626';
 export function getMantraLayoutByFontSize(fontSize: number = DEFAULT_FONT_SIZE) {
   return {
     fontSize,
-    charBoxWidth: 20 * 1,
-    charBoxHeight: 22 * 1,
+    charBoxWidth: 21 * 1,
+    charBoxHeight: 23 * 1,
     marginBottom: 8 * 1,
   };
 }

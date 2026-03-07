@@ -44,13 +44,9 @@ export default function ToggleSwitch({
 
   const trackAnimatedStyle = useAnimatedStyle(
     () => ({
-      backgroundColor: interpolateColor(
-        progress.value,
-        [0, 1],
-        [colors.border, colors.text]
-      ),
+      backgroundColor: interpolateColor(progress.value, [0, 1], [colors.border, colors.text]),
     }),
-    [colors.border, colors.text]
+    [colors.border, colors.text],
   );
 
   const thumbAnimatedStyle = useAnimatedStyle(() => ({
@@ -76,11 +72,7 @@ export default function ToggleSwitch({
       <Text style={[styles.label, { color: colors.icon }]}>{label}</Text>
       <Animated.View style={[styles.track, trackAnimatedStyle]}>
         <Animated.View
-          style={[
-            styles.thumb,
-            { backgroundColor: colors.background },
-            thumbAnimatedStyle,
-          ]}
+          style={[styles.thumb, { backgroundColor: colors.background }, thumbAnimatedStyle]}
         />
       </Animated.View>
     </Pressable>
@@ -91,7 +83,7 @@ const styles = StyleSheet.create({
   wrapper: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 12,
+    gap: 5,
   },
   disabled: {
     opacity: 0.5,

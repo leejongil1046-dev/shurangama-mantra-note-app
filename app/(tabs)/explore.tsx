@@ -7,10 +7,7 @@ import ToggleSwitch from '@/components/toggle-switch';
 import { Colors } from '@/constants/theme';
 import { SHURANGAMA_MANTRA_PAGES } from '@/data/shurangama-mantra';
 import { useColorScheme } from '@/hooks/use-color-scheme';
-import {
-  createBlankIndices,
-  difficultyToRatio,
-} from '@/lib/mantra-blank';
+import { createBlankIndices, difficultyToRatio } from '@/lib/mantra-blank';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const TOTAL_PAGES = SHURANGAMA_MANTRA_PAGES.length;
@@ -27,18 +24,11 @@ export default function TabTwoScreen() {
 
   const blankIndices = useMemo(() => {
     if (!blankEnabled) return new Set<number>();
-    return createBlankIndices(
-      SHURANGAMA_MANTRA_PAGES[pageIndex].mantra,
-      difficultyToRatio.medium
-    );
+    return createBlankIndices(SHURANGAMA_MANTRA_PAGES[pageIndex].mantra, difficultyToRatio.medium);
   }, [blankEnabled, pageIndex]);
 
   return (
-    <ScrollView
-      style={[styles.container, { backgroundColor }]}
-      contentContainerStyle={styles.content}
-      showsVerticalScrollIndicator={false}
-    >
+    <View style={[styles.container, { backgroundColor }]}>
       <View
         style={[
           styles.paginationWrap,
@@ -46,11 +36,7 @@ export default function TabTwoScreen() {
         ]}
       >
         <View style={styles.paginationLeft}>
-          <ToggleSwitch
-            label="빈칸"
-            checked={blankEnabled}
-            onChange={setBlankEnabled}
-          />
+          <ToggleSwitch label="빈칸" checked={blankEnabled} onChange={setBlankEnabled} />
         </View>
         <View style={styles.paginationCenter}>
           <PaginationControls
@@ -65,20 +51,26 @@ export default function TabTwoScreen() {
       </View>
 
       <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        contentContainerStyle={[styles.horizontalContent, { minWidth: SCREEN_WIDTH }]}
+        style={styles.scrollArea}
+        contentContainerStyle={styles.content}
+        showsVerticalScrollIndicator={false}
       >
-        <View style={styles.mantraWrap}>
-          <MantraTextView
-            mantra={current.mantra}
-            fontSize={16}
-            blankIndices={blankIndices}
-            mode="practice"
-          />
-        </View>
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={[styles.horizontalContent, { minWidth: SCREEN_WIDTH }]}
+        >
+          <View style={styles.mantraWrap}>
+            <MantraTextView
+              mantra={current.mantra}
+              fontSize={16}
+              blankIndices={blankIndices}
+              mode="practice"
+            />
+          </View>
+        </ScrollView>
       </ScrollView>
-    </ScrollView>
+    </View>
   );
 }
 
@@ -86,14 +78,18 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
+  scrollArea: {
+    flex: 1,
+  },
   content: {
     paddingVertical: 16,
+    paddingBottom: 32,
   },
   paginationWrap: {
     width: '100%',
     flexDirection: 'row',
     alignItems: 'center',
-    paddingBottom: 10,
+    paddingVertical: 10,
     marginBottom: 10,
     borderBottomWidth: 1,
     paddingHorizontal: 16,
