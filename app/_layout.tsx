@@ -33,7 +33,7 @@ export default function RootLayout() {
       <Stack
         screenOptions={{
           headerTitleAlign: 'center',
-          headerTitleStyle: { fontFamily: FONT_MANTRA_700, fontSize: 20 },
+          headerTitleStyle: { fontFamily: FONT_MANTRA_700, fontSize: 26 },
           headerTintColor: themeColors.text,
         }}
       >
