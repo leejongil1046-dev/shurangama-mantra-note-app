@@ -55,7 +55,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 10,
   },
-  label: { fontSize: 18, fontWeight: '600', marginBottom: 4 },
+  label: { fontSize: 18, fontWeight: '500', marginBottom: 4 },
   rangeInfo: {
     flexDirection: 'row',
     justifyContent: 'space-between',

@@ -81,9 +81,7 @@ export default function SettingModal({ open, onClose, mode }: SettingModalProps)
           <DifficultySetting value={tempDifficulty} onChange={setTempDifficulty} />
 
           <View style={styles.actions}>
-            {onClose && (
-              <ModalActionButton label="취소" onPress={onClose} variant="cancel" />
-            )}
+            {onClose && <ModalActionButton label="취소" onPress={onClose} variant="cancel" />}
             <ModalActionButton
               label="저장"
               onPress={handleSave}
@@ -102,7 +100,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0,0,0,0.4)',
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 24,
+    padding: 20,
   },
   panel: {
     width: '100%',
@@ -112,7 +110,7 @@ const styles = StyleSheet.create({
     padding: 30,
   },
   title: {
-    fontSize: 22,
+    fontSize: 20,
     fontWeight: '600',
     marginBottom: 30,
   },

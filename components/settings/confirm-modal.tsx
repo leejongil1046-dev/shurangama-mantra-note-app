@@ -1,13 +1,10 @@
 import { Modal, StyleSheet, Text, View } from 'react-native';
 
 import { Colors } from '@/constants/theme';
-import ModalActionButton from './modal-action-button';
 import { useColorScheme } from '@/hooks/use-color-scheme';
+import ModalActionButton from './modal-action-button';
 
-export type ConfirmMode =
-  | 'reset-practice'
-  | 'reset-memorize'
-  | 'grade-with-blanks';
+export type ConfirmMode = 'reset-practice' | 'reset-memorize' | 'grade-with-blanks';
 
 type ConfirmModalProps = {
   open: boolean;
@@ -41,14 +38,10 @@ const PRESET = {
   },
 } as const;
 
-function applyParams(
-  template: string,
-  params?: Record<string, string | number>,
-): string {
+function applyParams(template: string, params?: Record<string, string | number>): string {
   if (!params) return template;
   return Object.entries(params).reduce(
-    (acc, [key, value]) =>
-      acc.replace(new RegExp(`\\{${key}\\}`, 'g'), String(value)),
+    (acc, [key, value]) => acc.replace(new RegExp(`\\{${key}\\}`, 'g'), String(value)),
     template,
   );
 }
@@ -75,12 +68,7 @@ export default function ConfirmModal({
   };
 
   return (
-    <Modal
-      visible={open}
-      transparent
-      animationType="fade"
-      onRequestClose={onClose}
-    >
+    <Modal visible={open} transparent animationType="fade" onRequestClose={onClose}>
       <View style={styles.backdrop}>
         <View
           style={[
@@ -92,16 +80,10 @@ export default function ConfirmModal({
           ]}
         >
           <Text style={[styles.title, { color: colors.text }]}>{title}</Text>
-          <Text style={[styles.description, { color: colors.icon }]}>
-            {description}
-          </Text>
+          <Text style={[styles.description, { color: colors.icon }]}>{description}</Text>
           <View style={styles.actions}>
             <ModalActionButton label={cancelLabel} onPress={onClose} variant="cancel" />
-            <ModalActionButton
-              label={confirmLabel}
-              onPress={handleConfirm}
-              variant="primary"
-            />
+            <ModalActionButton label={confirmLabel} onPress={handleConfirm} variant="primary" />
           </View>
         </View>
       </View>
@@ -115,7 +97,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0,0,0,0.4)',
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 24,
+    padding: 20,
   },
   panel: {
     width: '100%',
@@ -130,7 +112,7 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   description: {
-    fontSize: 15,
+    fontSize: 14,
     lineHeight: 22,
     marginBottom: 24,
   },

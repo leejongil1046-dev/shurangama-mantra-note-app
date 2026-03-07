@@ -1,14 +1,19 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo } from 'react';
 import { Dimensions, ScrollView, StyleSheet, View } from 'react-native';
 
+import GradeResultModal from '@/components/grade-result-modal';
 import MantraTextView from '@/components/mantra-text-view';
 import MemorizeActions from '@/components/memorize-actions';
 import PaginationControls from '@/components/pagination-controls';
+import ConfirmModal from '@/components/settings/confirm-modal';
 import TopSettingButton from '@/components/top-setting-button';
 import { Colors } from '@/constants/theme';
 import { SHURANGAMA_MANTRA_PAGES } from '@/data/shurangama-mantra';
 import { useColorScheme } from '@/hooks/use-color-scheme';
+import { useMemorizeGrading } from '@/hooks/use-memorize-grading';
 import { usePagination } from '@/hooks/use-pagination';
+import { createBlankIndices, difficultyToRatio } from '@/lib/mantra-blank';
+import { useMemorizeStore } from '@/store/memorize-store';
 import { useSettingStore } from '@/store/setting-store';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
@@ -16,9 +21,9 @@ const { width: SCREEN_WIDTH } = Dimensions.get('window');
 export default function MemorizeScreen() {
   const colorScheme = useColorScheme();
   const backgroundColor = Colors[colorScheme ?? 'light'].background;
-  const [isActive, setIsActive] = useState(false);
 
-  const { pageStart, pageEnd } = useSettingStore((s) => s.memorize);
+  const { pageStart, pageEnd, difficulty } = useSettingStore((s) => s.memorize);
+  const ratio = difficultyToRatio[difficulty];
 
   const selectedPages = useMemo(
     () =>
@@ -27,22 +32,83 @@ export default function MemorizeScreen() {
   );
 
   const {
+    isActive,
+    blankByPage,
+    answersByPage,
+    lastPageIndex,
+    gradeResult,
+    startSession,
+    setAnswer,
+    setLastPageIndex,
+    setGradeResult,
+    resetSession,
+  } = useMemorizeStore();
+
+  const initialIndex = isActive
+    ? Math.min(lastPageIndex, Math.max(0, selectedPages.length - 1))
+    : 0;
+
+  const {
+    currentIndex: currentPageIndex,
     currentItem: currentPage,
     isFirst,
     isLast,
     goPrev,
     goNext,
     setCurrentIndex,
-  } = usePagination({ items: selectedPages });
+  } = usePagination({ items: selectedPages, initialIndex });
+
+  const currentAnswers = answersByPage[currentPageIndex] ?? {};
+
+  const handleChangeAnswer = (index: number, value: string) => {
+    setAnswer(currentPageIndex, index, value);
+  };
+
+  const currentBlankIndicesArray = blankByPage[currentPageIndex] ?? [];
+  const currentBlankIndices = new Set<number>(currentBlankIndicesArray);
 
   const handleStartMemorize = () => {
-    setIsActive(true);
+    const nextBlankByPage: Record<number, number[]> = {};
+    selectedPages.forEach((page, index) => {
+      const indices = createBlankIndices(page.mantra, ratio);
+      nextBlankByPage[index] = Array.from(indices);
+    });
+    startSession({
+      blankByPage: nextBlankByPage,
+      initialPageIndex: currentPageIndex,
+    });
   };
 
   const handleResetMemorize = () => {
-    setIsActive(false);
+    resetSession();
     setCurrentIndex(0);
   };
+
+  const {
+    totalBlanks,
+    filledCount,
+    gradeDisplay,
+    isGradeConfirmOpen,
+    setIsGradeConfirmOpen,
+    isResultModalOpen,
+    setIsResultModalOpen,
+    handleGradeClick,
+    handleGradeConfirm,
+  } = useMemorizeGrading({
+    blankByPage,
+    answersByPage,
+    selectedPages,
+    gradeResult,
+    setGradeResult,
+    currentPageIndex,
+    currentPage: currentPage ?? undefined,
+  });
+
+  useEffect(() => {
+    if (isActive) {
+      setLastPageIndex(currentPageIndex);
+    }
+  }, [currentPageIndex, isActive, setLastPageIndex]);
 
   if (!currentPage) return null;
 
@@ -55,16 +121,16 @@ export default function MemorizeScreen() {
           <MemorizeActions
             hasHydrated={true}
             isActive={isActive}
-            isGraded={false}
+            isGraded={!!gradeResult}
             onStart={handleStartMemorize}
-            onGrade={undefined}
+            onGrade={handleGradeClick}
           />
         </View>
         <View style={styles.topBarCenter}>
           <PaginationControls
             isFirst={isFirst}
             isLast={isLast}
-            label={currentPage ? `${currentPage.pageNumber} / 12` : '0 / 0'}
+            label={`${currentPage.pageNumber} / 12`}
             onPrev={goPrev}
             onNext={goNext}
           />
@@ -73,6 +139,24 @@ export default function MemorizeScreen() {
           <TopSettingButton mode="memorize" onReset={handleResetMemorize} />
         </View>
       </View>
+
+      <ConfirmModal
+        open={isGradeConfirmOpen}
+        mode="grade-with-blanks"
+        params={{ totalBlanks, filledCount }}
+        onConfirm={handleGradeConfirm}
+        onClose={() => setIsGradeConfirmOpen(false)}
+      />
+
+      {gradeResult && (
+        <GradeResultModal
+          open={isResultModalOpen}
+          onClose={() => setIsResultModalOpen(false)}
+          gradeResult={gradeResult}
+          pageNumbers={selectedPages.map((p) => p.pageNumber)}
+          difficulty={difficulty}
+        />
+      )}
 
       <ScrollView
         style={styles.scrollArea}
@@ -85,7 +169,17 @@ export default function MemorizeScreen() {
           contentContainerStyle={[styles.horizontalContent, { minWidth: SCREEN_WIDTH }]}
         >
           <View style={styles.mantraWrap}>
-            {currentPage && (
+            {isActive ? (
+              <MantraTextView
+                mantra={currentPage.mantra}
+                fontSize={16}
+                blankIndices={currentBlankIndices}
+                mode="memorize"
+                answers={currentAnswers}
+                onChangeAnswer={gradeResult ? undefined : handleChangeAnswer}
+                gradeDisplay={gradeDisplay}
+              />
+            ) : (
               <MantraTextView
                 mantra={currentPage.mantra}
                 fontSize={16}
@@ -130,7 +224,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   content: {
-    paddingVertical: 10,
+    paddingVertical: 16,
   },
   horizontalContent: {
     paddingHorizontal: 16,

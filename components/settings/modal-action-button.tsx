@@ -7,9 +7,15 @@ type ModalActionButtonProps = {
   label: string;
   onPress: () => void;
   variant: 'cancel' | 'primary' | 'primaryDisabled';
+  fontSize?: number;
 };
 
-export default function ModalActionButton({ label, onPress, variant }: ModalActionButtonProps) {
+export default function ModalActionButton({
+  label,
+  onPress,
+  variant,
+  fontSize = 14,
+}: ModalActionButtonProps) {
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme ?? 'light'];
 
@@ -39,14 +45,15 @@ const styles = StyleSheet.create({
   button: {
     paddingVertical: 10,
     paddingHorizontal: 20,
-    borderRadius: 8,
+    borderRadius: 6,
     alignSelf: 'flex-start',
   },
   cancelBorder: {
     borderWidth: 1,
   },
   label: {
-    fontSize: 15,
+    fontSize: 14,
+    lineHeight: 20,
     fontWeight: '400',
   },
 });
